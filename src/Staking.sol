@@ -5,7 +5,6 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 contract Staking is ReentrancyGuard {
-
     IERC20 public immutable token;
 
     address public owner;
@@ -26,13 +25,10 @@ contract Staking is ReentrancyGuard {
         _;
     }
 
-
     constructor(address _token) {
         token = IERC20(_token);
         owner = msg.sender;
     }
-
-
 
     // Staking logic
     function stake(uint256 amount, uint256 duration) external {
@@ -41,7 +37,7 @@ contract Staking is ReentrancyGuard {
 
         Stake storage s = stakes[msg.sender];
 
-        // запрещаем второй стейк 
+        // запрещаем второй стейк
         require(s.amount == 0, "Already staked");
 
         // переводим токены в контракт
@@ -49,15 +45,10 @@ contract Staking is ReentrancyGuard {
         require(success, "Transfer failed");
 
         // записываем стейк
-        stakes[msg.sender] = Stake({
-            amount: amount,
-            start: block.timestamp,
-            expiry: block.timestamp + duration
-        });
+        stakes[msg.sender] = Stake({amount: amount, start: block.timestamp, expiry: block.timestamp + duration});
 
         emit Staked(msg.sender, amount, duration);
     }
-
 
     function unstake() external nonReentrant {
         Stake memory s = stakes[msg.sender];
@@ -72,8 +63,6 @@ contract Staking is ReentrancyGuard {
 
         emit Unstaked(msg.sender, s.amount);
     }
-
-
 
     function votingPower(address user) public view returns (uint256) {
         Stake memory s = stakes[user];
@@ -92,11 +81,9 @@ contract Staking is ReentrancyGuard {
         return (s.amount * remaining) / duration;
     }
 
-
     function getStake(address user) external view returns (Stake memory) {
         return stakes[user];
     }
-
 
     // На случай бага
     function emergencyWithdraw(address to, uint256 amount) external onlyOwner {

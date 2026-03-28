@@ -27,11 +27,9 @@ contract Voting {
 
     mapping(bytes32 => mapping(address => bool)) public voted;
 
-
     event VotingCreated(bytes32 indexed id, uint256 deadline, uint256 threshold);
     event Voted(bytes32 indexed id, address indexed user, bool support, uint256 power);
     event Finalized(bytes32 indexed id, bool passed);
-
 
     modifier onlyOwner() {
         require(msg.sender == owner, "Not owner");
@@ -44,15 +42,10 @@ contract Voting {
         owner = msg.sender;
     }
 
-
-
-    function createVoting(
-        bytes32 id,
-        uint256 duration,
-        uint256 threshold,
-        string memory description
-    ) external onlyOwner {
-
+    function createVoting(bytes32 id, uint256 duration, uint256 threshold, string memory description)
+        external
+        onlyOwner
+    {
         require(votings[id].id == 0, "Already exists");
         require(duration > 0, "Zero duration");
 
@@ -69,9 +62,7 @@ contract Voting {
         emit VotingCreated(id, block.timestamp + duration, threshold);
     }
 
-
     function vote(bytes32 id, bool support) external {
-
         VotingStruct storage v = votings[id];
 
         require(v.id != 0, "Voting not found");
@@ -93,20 +84,13 @@ contract Voting {
         emit Voted(id, msg.sender, support, power);
     }
 
-
     function finalize(bytes32 id) external {
-
         VotingStruct storage v = votings[id];
 
         require(v.id != 0, "Voting not found");
         require(!v.finalized, "Already finalized");
 
-
-        require(
-            block.timestamp >= v.deadline ||
-            v.yesVotes >= v.threshold,
-            "Not finished"
-        );
+        require(block.timestamp >= v.deadline || v.yesVotes >= v.threshold, "Not finished");
 
         v.finalized = true;
 
@@ -116,8 +100,6 @@ contract Voting {
 
         emit Finalized(id, passed);
     }
-
-
 
     function getVotes(bytes32 id) external view returns (uint256 yes, uint256 no) {
         VotingStruct memory v = votings[id];
